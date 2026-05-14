@@ -2,30 +2,37 @@ import { Router } from 'express';
 import { txDb } from '../db.js';
 import { requireAuth } from '../middleware/auth.js';
 
+const SECTIONS = ['income', 'savings', 'fixed', 'variable', 'debt'];
 const router = Router();
 router.use(requireAuth);
 
 router.get('/', async (req, res) => {
-  const docs = await txDb.findAsync({ userId: req.user.id }).sort({ date: -1, createdAt: -1 });
+  const { year, month } = req.query;
+  const query = { userId: req.user.id };
+  if (year)  query.year  = parseInt(year);
+  if (month) query.month = parseInt(month);
+  const docs = await txDb.findAsync(query).sort({ date: -1, createdAt: -1 });
   res.json(docs);
 });
 
 router.post('/', async (req, res) => {
-  const { type, amount, date, category, description } = req.body;
-  if (!type || !amount || !date || !category)
-    return res.status(400).json({ error: 'type, amount, date and category are required' });
-  if (!['income', 'expense'].includes(type))
-    return res.status(400).json({ error: 'type must be income or expense' });
+  const { year, month, section, lineName, amount, date, notes } = req.body;
+  if (!year || !month || !section || !lineName || !amount || !date)
+    return res.status(400).json({ error: 'year, month, section, lineName, amount and date are required' });
+  if (!SECTIONS.includes(section))
+    return res.status(400).json({ error: `section must be one of: ${SECTIONS.join(', ')}` });
   if (typeof amount !== 'number' || amount <= 0)
     return res.status(400).json({ error: 'amount must be a positive number' });
 
   const doc = await txDb.insertAsync({
     userId: req.user.id,
-    type,
+    year: parseInt(year),
+    month: parseInt(month),
+    section,
+    lineName,
     amount,
     date,
-    category,
-    description: description || category,
+    notes: notes || '',
     createdAt: new Date(),
   });
   res.status(201).json(doc);

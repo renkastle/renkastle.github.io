@@ -2,9 +2,9 @@ import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: 'auth',      loadComponent: () => import('./auth/auth.component').then(m => m.AuthComponent) },
-  { path: 'dashboard', loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent), canActivate: [authGuard] },
-  { path: 'overview',  loadComponent: () => import('./overview/overview.component').then(m => m.OverviewComponent),  canActivate: [authGuard] },
-  { path: '**', redirectTo: 'dashboard' },
+  { path: '', redirectTo: 'budget', pathMatch: 'full' },
+  { path: 'auth',    loadComponent: () => import('./auth/auth.component').then(m => m.AuthComponent) },
+  { path: 'budget',  loadComponent: () => import('./monthly-budget/monthly-budget.component').then(m => m.MonthlyBudgetComponent), canActivate: [authGuard] },
+  { path: 'summary', loadComponent: () => import('./annual-summary/annual-summary.component').then(m => m.AnnualSummaryComponent), canActivate: [authGuard] },
+  { path: '**', redirectTo: 'budget' },
 ];

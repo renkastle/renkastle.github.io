@@ -1,14 +1,18 @@
 import { Injectable, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { tap } from 'rxjs';
+
+export type SectionType = 'income' | 'savings' | 'fixed' | 'variable' | 'debt';
 
 export interface Transaction {
   _id: string;
-  type: 'income' | 'expense';
+  year: number;
+  month: number;
+  section: SectionType;
+  lineName: string;
   amount: number;
   date: string;
-  category: string;
-  description: string;
+  notes: string;
   createdAt: string;
 }
 
@@ -19,9 +23,15 @@ export class TransactionService {
 
   constructor(private http: HttpClient) {}
 
-  load() {
-    return this.http.get<Transaction[]>(this.API)
+  load(year: number, month: number) {
+    const params = new HttpParams().set('year', year).set('month', month);
+    return this.http.get<Transaction[]>(this.API, { params })
       .pipe(tap(list => this.transactions.set(list)));
+  }
+
+  loadYear(year: number) {
+    const params = new HttpParams().set('year', year);
+    return this.http.get<Transaction[]>(this.API, { params });
   }
 
   add(tx: Omit<Transaction, '_id' | 'createdAt'>) {

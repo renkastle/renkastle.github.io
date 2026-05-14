@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import authRoutes from './routes/auth.js';
 import txRoutes from './routes/transactions.js';
+import budgetLinesRoutes from './routes/budget-lines.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,7 +13,7 @@ app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/transactions', txRoutes);
-
+app.use('/api/budget-lines', budgetLinesRoutes);
 app.get('/api/health', (_, res) => res.json({ ok: true }));
 
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
