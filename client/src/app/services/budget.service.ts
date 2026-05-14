@@ -31,6 +31,20 @@ export class BudgetService {
     return this.http.get<BudgetLine[]>(this.API, { params });
   }
 
+  latestMonth(beforeYear: number, beforeMonth: number) {
+    const params = new HttpParams()
+      .set('before_year', beforeYear)
+      .set('before_month', beforeMonth);
+    return this.http.get<{ year: number; month: number } | null>(
+      `${this.API}/latest-month`, { params }
+    );
+  }
+
+  copyFrom(fromYear: number, fromMonth: number, toYear: number, toMonth: number) {
+    return this.http.post<BudgetLine[]>(`${this.API}/copy-from`, { fromYear, fromMonth, toYear, toMonth })
+      .pipe(tap(lines => this.lines.set(lines)));
+  }
+
   add(line: Omit<BudgetLine, '_id' | 'createdAt'>) {
     return this.http.post<BudgetLine>(this.API, line)
       .pipe(tap(created => this.lines.update(list => [...list, created])));
